@@ -71,7 +71,8 @@ LISTING = -list="$(OBJSDIR)\$*.lst"
 COPT_LINK = -g
 CDEFS = _KAMUI2_ __SET4__ __SET5__ __KATANA__ _CLX_ _CLX2_ _STRICT_UNION_ _SH4 \
 	NG_COMP_SHC NG_CPU_SH4 NG_LITTLE_ENDIAN NG_HW_SEGADC \
-	DCJAM_PLATFORM_$(BUILD_PLATFORM) DCJAM_ARCH_$(ARCH) DCJAM_BITSIZE_$(BITSIZE)
+	DCJAM_PLATFORM_$(BUILD_PLATFORM) DCJAM_ARCH_$(ARCH) DCJAM_BITSIZE_$(BITSIZE) \
+	DCJAM_BUILD_$(BUILD_DEF)
 
 COPT = -cpu=sh4 -division=cpu -endian=little -fpu=single -round=nearest \
 	-pic=0 -macsave=0 -string=const -comment=nonest -sjis \
