@@ -2,6 +2,7 @@
 #include <Memory.h>
 #include <Log.h>
 #include <Renderer.h>
+#include <Peripheral.h>
 #include <GitVersion.h>
 
 void main( void )
@@ -16,6 +17,7 @@ void main( void )
 	PKMSURFACEDESC Framebuffer[ 2 ];
 	KMSURFACEDESC FrontBuffer, BackBuffer;
 	SYE_CBL AVCable;
+	bool Run = true;
 
 	if( HW_Initialise( KM_DSPBPP_RGB888, &AVCable, &MemoryFree ) != HW_OK )
 	{
@@ -113,8 +115,15 @@ void main( void )
 
 	REN_SetClearColour( 0.0f, 1.0f, 0.0f );
 
-	while( 1 )
+	g_Peripherals[ 0 ].press = 0;
+
+	while( Run )
 	{
+		if( g_Peripherals[ 0 ].on & PDD_DGT_ST )
+		{
+			Run = false;
+		}
+
 		REN_Clear( );
 		REN_SwapBuffers( );
 	}

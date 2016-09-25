@@ -55,6 +55,8 @@ Sint32 HW_Initialise( KMBPPMODE p_BPP, SYE_CBL *p_pCableType,
 	 * graphics library is initialised */
 	syHwInit2( );
 
+	PER_Initialise( );
+
 	/* Start the real-time clock */
 	syRtcInit( );
 
@@ -72,6 +74,7 @@ Sint32 HW_Initialise( KMBPPMODE p_BPP, SYE_CBL *p_pCableType,
 void HW_Terminate( void )
 {
 	syRtcFinish( );
+	PER_Terminate( );
 	kmUnloadDevice( );
 	syStartGlobalDestructor( );
 	MEM_Terminate( );
