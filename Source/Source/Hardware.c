@@ -1,5 +1,8 @@
 #include <Hardware.h>
 #include <Memory.h>
+#include <Peripheral.h>
+#include <FileSystem.h>
+#include <Log.h>
 
 KMVOID PALExtCallback( PKMVOID p_pArgs );
 
@@ -62,6 +65,13 @@ Sint32 HW_Initialise( KMBPPMODE p_BPP, SYE_CBL *p_pCableType,
 
 	set_imask( 0 );
 
+	if( FS_Initialise( ) != FS_OK )
+	{
+		LOG_Debug( "Failed to initialise the file system" );
+
+		return HW_FATALERROR;
+	}
+
 	if( syCblCheck( ) == SYE_CBL_PAL )
 	{
 		kmSetPALEXTCallback( PALExtCallback, NULL );
@@ -73,6 +83,7 @@ Sint32 HW_Initialise( KMBPPMODE p_BPP, SYE_CBL *p_pCableType,
 
 void HW_Terminate( void )
 {
+	FS_Terminate( );
 	syRtcFinish( );
 	PER_Terminate( );
 	kmUnloadDevice( );
@@ -93,5 +104,32 @@ KMVOID PALExtCallback( PKMVOID p_pArgs )
 
 	pPALInfo = ( PKMPALEXTINFO )p_pArgs;
 	pPALInfo->nPALExtMode = KM_PALEXT_HEIGHT_RATIO_1_166;
+}
+
+Sint32 HW_GetConsoleID( PHW_CONSOLEID p_pConsoleID )
+{
+	if( syCfgGetIndividualID( p_pConsoleID->ConsoleID ) != SYD_CFG_IID_OK )
+	{
+		LOG_Debug( "Failed to acquire the console's ID" );
+
+		memset( p_pConsoleID->ConsoleID, 0,
+			sizeof( p_pConsoleID->ConsoleID ) );
+		memset( p_pConsoleID->ConsoleIDString, '\0',
+			sizeof( p_pConsoleID->ConsoleIDString ) );
+
+		return HW_FATALERROR;
+	}
+
+	sprintf( p_pConsoleID->ConsoleIDString, "%02X%02X%02X%02X%02X%02X",
+		( unsigned char )p_pConsoleID->ConsoleID[ 0 ],
+		( unsigned char )p_pConsoleID->ConsoleID[ 1 ],
+		( unsigned char )p_pConsoleID->ConsoleID[ 2 ],
+		( unsigned char )p_pConsoleID->ConsoleID[ 3 ],
+		( unsigned char )p_pConsoleID->ConsoleID[ 4 ],
+		( unsigned char )p_pConsoleID->ConsoleID[ 5 ] );
+
+	p_pConsoleID->ConsoleIDString[ ( SYD_CFG_IID_SIZE * 2 ) ] = '\0';
+
+	return HW_OK;
 }
 
