@@ -282,10 +282,10 @@ void MAT44_TransformVertices( float *p_pTransformedVertices,
 	}
 #endif /* DCJAM_BUILD_DEBUG */
 
-	UStrideGap = ( p_UntransformedStride - ( sizeof( float ) * 3 ) /
-		sizeof( float ) );
-	TStrideGap = ( p_TransformedStride - ( sizeof( float ) * 3 ) /
-		sizeof( float ) );
+	UStrideGap = ( p_UntransformedStride - ( sizeof( float ) * 3 ) ) /
+		sizeof( float );
+	TStrideGap = ( p_TransformedStride - ( sizeof( float ) * 3 ) ) /
+		sizeof( float );
 
 	ld_ext( ( void * )p_pMatrix );
 
@@ -315,8 +315,8 @@ void MAT44_TransformVertices( float *p_pTransformedVertices,
 
 			RHW = 1.0f / g_ResultVector[ 2 ];
 
-			*( pDestinationVector++ ) = RHW / g_ResultVector[ 0 ];
-			*( pDestinationVector++ ) = RHW / g_ResultVector[ 1 ];
+			*( pDestinationVector++ ) = RHW * g_ResultVector[ 0 ];
+			*( pDestinationVector++ ) = RHW * g_ResultVector[ 1 ];
 			*( pDestinationVector++ ) = RHW;
 		}
 		else

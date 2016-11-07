@@ -15,6 +15,10 @@ Sint32 GSM_Initialise( PGAMESTATE_MANAGER p_pGameStateManager,
 	memcpy( &p_pGameStateManager->MemoryBlocks, p_pMemoryBlocks,
 		sizeof( GAMESTATE_MEMORY_BLOCKS ) );
 
+	p_pGameStateManager->ppGlyphSet = MEM_AllocateFromMemoryBlock(
+		p_pGameStateManager->MemoryBlocks.pSystemMemoryBlock,
+		sizeof( PGLYPHSET ) * GSM_GLYPH_SET_COUNT, "GSM: Glyph set" ); 
+
 	if( STK_Initialise( &p_pGameStateManager->GameStateStack,
 		p_pGameStateManager->MemoryBlocks.pSystemMemoryBlock, 10,
 		sizeof( GAMESTATE ), 8, "GSM: Game State Stack" ) != STK_OK )
@@ -54,6 +58,10 @@ void GSM_Terminate( PGAMESTATE_MANAGER p_pGameStateManager )
 
 		pRegistryItr = pNext;
 	}
+
+	MEM_FreeFromMemoryBlock(
+		p_pGameStateManager->MemoryBlocks.pSystemMemoryBlock,
+		p_pGameStateManager->ppGlyphSet );
 
 	STK_Terminate( &p_pGameStateManager->GameStateStack );
 }
@@ -194,6 +202,20 @@ bool GSM_IsRunning( PGAMESTATE_MANAGER p_pGameStateManager )
 	return p_pGameStateManager->Running;
 }
 
+Sint32 GSM_RegisterGlyphSet( PGAMESTATE_MANAGER p_pGameStateManager,
+	const Uint32 p_Index, PGLYPHSET p_pGlyphSet )
+{
+	p_pGameStateManager->ppGlyphSet[ p_Index ] = p_pGlyphSet;
+
+	return GSM_OK;
+}
+
+PGLYPHSET GSM_GetGlyphSet( PGAMESTATE_MANAGER p_pGameStateManager,
+	const Uint32 p_Index )
+{
+	return p_pGameStateManager->ppGlyphSet[ p_Index ];
+}
+
 Sint32 GSM_RegisterGameState( PGAMESTATE_MANAGER p_pGameStateManager,
 	const char *p_pGameStateName, PGAMESTATE p_pGameState )
 {
@@ -237,6 +259,10 @@ Sint32 GSM_RegisterGameState( PGAMESTATE_MANAGER p_pGameStateManager,
 			pAppendTo = pRegistryItr;
 			pRegistryItr = pRegistryItr->pNext;
 		}
+
+		pNewEntry = MEM_AllocateFromMemoryBlock(
+			p_pGameStateManager->MemoryBlocks.pSystemMemoryBlock,
+			sizeof( GAMESTATE_REGISTRY ), Registry );
 	}
 
 	pNewEntry->pName = MEM_AllocateFromMemoryBlock(

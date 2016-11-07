@@ -137,9 +137,9 @@ void CAM_TransformNonClipPerspective( float *p_pTransformedVertices,
 		RHW = 1.0f / g_ResultVector[ 2 ];
 
 		*( pDestinationVector++ ) =
-			RHW * HalfWidth * g_ResultVector[ 0 ] - HalfWidth;
+			RHW * HalfWidth * g_ResultVector[ 0 ] + HalfWidth;
 		*( pDestinationVector++ ) =
-			RHW * -HalfHeight * g_ResultVector[ 1 ] - HalfHeight;
+			RHW * -HalfHeight * g_ResultVector[ 1 ] + HalfHeight;
 		*( pDestinationVector++ ) = RHW;
 
 		pDestinationVector += TStride;

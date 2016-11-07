@@ -3,15 +3,23 @@
 
 #include <Memory.h>
 #include <Stack.h>
+#include <Text.h>
 
 #define GSM_OK 0
 #define GSM_ERROR 1
-#define GSM_STATEALREADYREGISTERED 1000
+#define GSM_STATEALREADYREGISTERED 4000
 #define GSM_FATALERROR -1
 #define GSM_STACKINIT -1000
 #define GSM_POPSTATE -2000
 #define GSM_PUSHSTATE -3000
 #define GSM_STATENOTFOUND -4000
+
+enum GSM_GLYPH_SET
+{
+	GSM_GLYPH_SET_DEBUG	= 0,
+	GSM_GLYPH_SET_GUI_1,
+	GSM_GLYPH_SET_COUNT
+};
 
 typedef struct _tagGAMESTATE_MEMORY_BLOCKS
 {
@@ -33,6 +41,7 @@ typedef struct _tagGAMESTATE_MANAGER
 	GAMESTATE_MEMORY_BLOCKS	MemoryBlocks;
 	PGAMESTATE_REGISTRY		pRegistry;
 	struct _tagGAMESTATE	*pTopGameState;
+	PGLYPHSET				*ppGlyphSet;
 	STACK					GameStateStack;
 	bool					Running;
 }GAMESTATE_MANAGER, *PGAMESTATE_MANAGER;
@@ -52,6 +61,11 @@ Sint32 GSM_PopGameState( PGAMESTATE_MANAGER p_pGameStateManager );
 Sint32 GSM_Run( PGAMESTATE_MANAGER p_pGameStateManager );
 Sint32 GSM_Quit( PGAMESTATE_MANAGER p_pGameStateManager );
 bool GSM_IsRunning( PGAMESTATE_MANAGER p_pGameStateManager );
+
+Sint32 GSM_RegisterGlyphSet( PGAMESTATE_MANAGER p_pGameStateManager,
+	const Uint32 p_Index, PGLYPHSET p_pGlyphSet );
+PGLYPHSET GSM_GetGlyphSet( PGAMESTATE_MANAGER p_pGameStateManager,
+	const Uint32 p_Index );
  
 Sint32 GSM_RegisterGameState( PGAMESTATE_MANAGER p_pGameStateManager,
 	const char *p_pGameStateName, struct _tagGAMESTATE *p_pGameState );

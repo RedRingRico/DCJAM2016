@@ -5,6 +5,7 @@
 #include <Camera.h>
 #include <kamui2.h>
 #include <Peripheral.h>
+#include <GameStates/MainMenu.h>
 
 typedef struct _tagASPECTRATIOSELECT_GAMESTATE
 {
@@ -255,8 +256,8 @@ static Sint32 Update( void *p_pArgs )
 		}
 		else
 		{
-			/* Replace this with the main menu */
-			GSM_Quit( AspectRatioSelectState.Base.pGameStateManager );
+			GSM_ChangeGameState( AspectRatioSelectState.Base.pGameStateManager,
+				GAME_STATE_MAINMENU, NULL, NULL );
 		}
 
 		Alpha += AlphaInc;

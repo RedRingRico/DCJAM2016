@@ -12,9 +12,9 @@
 #include <kamui2.h>
 #include <kamuix.h>
 
-void *g_pTextureWorkArea = NULL;
-void *g_pVertexBufferWorkArea = NULL;
-KMVERTEXBUFFDESC g_VertexBufferDescription;
+static void *g_pTextureWorkArea = NULL;
+static void *g_pVertexBufferWorkArea = NULL;
+static KMVERTEXBUFFDESC g_VertexBufferDescription;
 
 static KMSYSTEMCONFIGSTRUCT g_Kamui2Configuration;
 static KMSTRIPCONTEXT g_DefaultStripContext =
@@ -61,6 +61,9 @@ static KMSTRIPCONTEXT g_DefaultStripContext =
 		0							/* Texture surface description */
 	} /* KMIMAGECONTROL */
 };
+
+static KMSTRIPHEAD g_StripHead01;
+static KMSTRIPHEAD g_StripHead16;
 
 Sint32 REN_Initialise( PRENDERER p_pRenderer,
 	const PDREAMCAST_RENDERERCONFIGURATION p_pRendererConfiguration )
@@ -175,6 +178,12 @@ Sint32 REN_Initialise( PRENDERER p_pRenderer,
 		}
 	}
 
+	memset( &g_StripHead16, 0, sizeof( g_StripHead16 ) );
+	kmGenerateStripHead16( &g_StripHead16, &g_DefaultStripContext );
+
+	memset( &g_StripHead01, 0, sizeof( g_StripHead01 ) );
+	kmGenerateStripHead01( &g_StripHead01, &g_DefaultStripContext );
+
 	return REN_OK;
 }
 
@@ -193,6 +202,18 @@ void REN_Terminate( PRENDERER p_pRenderer )
 			g_pTextureWorkArea );
 		g_pTextureWorkArea = NULL;
 	}
+
+	/* Print out some useful memory statistics */
+#if defined ( DCJAM_BUILD_DEBUG )
+	{
+		KMUINT32 AvailableTextureMemory, MaxBlockSizeOfTexture;
+
+		kmGetFreeTextureMem( &AvailableTextureMemory, &MaxBlockSizeOfTexture );
+
+		LOG_Debug( "KAMUI2 Texture Memory Available: %ld",
+			AvailableTextureMemory );
+	}
+#endif /* DCJAM_BUILD_DEBUG */
 }
 
 void REN_SetClearColour( float p_Red, float p_Green, float p_Blue )
@@ -256,5 +277,80 @@ Sint32 REN_SwapBuffers( void )
 	kmEndScene( &g_Kamui2Configuration );
 
 	return REN_OK;
+}
+
+void REN_DrawPrimitives01( PKMSTRIPHEAD p_pStripHead, PKMVERTEX_01 p_pVertices,
+	KMUINT32 p_Count )
+{
+	KMUINT32 VertexIndex;
+
+	kmxxGetCurrentPtr( g_Kamui2Configuration.pBufferDesc );
+
+	if( p_pStripHead )
+	{
+		kmxxStartStrip( g_Kamui2Configuration.pBufferDesc, p_pStripHead );
+	}
+	else
+	{
+		kmxxStartStrip( g_Kamui2Configuration.pBufferDesc, &g_StripHead01 );
+	}
+
+	for( VertexIndex = 0; VertexIndex < p_Count; ++VertexIndex )
+	{
+		kmxxSetVertex_1(
+			p_pVertices[ VertexIndex ].ParamControlWord,
+			p_pVertices[ VertexIndex ].fX,
+			p_pVertices[ VertexIndex ].fY,
+			p_pVertices[ VertexIndex ].u.fZ,
+			p_pVertices[ VertexIndex ].fBaseAlpha,
+			p_pVertices[ VertexIndex ].fBaseRed,
+			p_pVertices[ VertexIndex ].fBaseGreen,
+			p_pVertices[ VertexIndex ].fBaseBlue );
+	}
+
+	kmxxReleaseCurrentPtr( g_Kamui2Configuration.pBufferDesc );
+
+	kmEndStrip( g_Kamui2Configuration.pBufferDesc );
+}
+
+void REN_DrawPrimitives16( PKMSTRIPHEAD p_pStripHead, PKMVERTEX_16 p_pVertices,
+	KMUINT32 p_Count )
+{
+	KMUINT32 VertexIndex;
+
+	kmxxGetCurrentPtr( g_Kamui2Configuration.pBufferDesc );
+
+	if( p_pStripHead )
+	{
+		kmxxStartStrip( g_Kamui2Configuration.pBufferDesc, p_pStripHead );
+	}
+	else
+	{
+		kmxxStartStrip( g_Kamui2Configuration.pBufferDesc, &g_StripHead16 );
+	}
+
+	for( VertexIndex = 0; VertexIndex < p_Count; ++VertexIndex )
+	{
+		kmxxSetVertex_16(
+			p_pVertices[ VertexIndex ].ParamControlWord,
+			p_pVertices[ VertexIndex ].fAX,
+			p_pVertices[ VertexIndex ].fAY,
+			p_pVertices[ VertexIndex ].uA.fAZ,
+			p_pVertices[ VertexIndex ].fBX,
+			p_pVertices[ VertexIndex ].fBY,
+			p_pVertices[ VertexIndex ].uB.fBZ,
+			p_pVertices[ VertexIndex ].fCX,
+			p_pVertices[ VertexIndex ].fCY,
+			p_pVertices[ VertexIndex ].uC.fCZ,
+			p_pVertices[ VertexIndex ].fDX,
+			p_pVertices[ VertexIndex ].fDY,
+			p_pVertices[ VertexIndex ].dwUVA,
+			p_pVertices[ VertexIndex ].dwUVB,
+			p_pVertices[ VertexIndex ].dwUVC );
+	}
+
+	kmxxReleaseCurrentPtr( g_Kamui2Configuration.pBufferDesc );
+
+	kmEndStrip( g_Kamui2Configuration.pBufferDesc );
 }
 
