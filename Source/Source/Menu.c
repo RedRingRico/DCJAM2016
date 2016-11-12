@@ -76,15 +76,15 @@ Sint32 MNU_Initialise( PMENU p_pMenu, PMENU_ITEM p_pMenuItems,
 		for( Index = 0; Index < p_MenuItemCount; ++Index )
 		{
 			size_t Offset = ( Index + 1 ) * MenuSize;
-			size_t NameLength = strlen( p_pMenuItems[ Index ] );
+			size_t NameLength = strlen( p_pMenuItems[ Index ].pName );
 
 			p_pMenu->pMenuItems[ Index ].pNext =
 				( PMENU_ITEM )( ( size_t )p_pMenu->pMenuItems + Offset );
-			/*p_pMenu->pMenuItems[ Index ].pName = MEM_AllocateFromMemoryBlock(
+			p_pMenu->pMenuItems[ Index ].pName = MEM_AllocateFromMemoryBlock(
 				p_pMemoryBlock, NameLength + 1, "Menu item name" );
-			memcpy( p_pMenu->pMenuItems[ Index ].pName, p_pMenuItems[ Index ],
-				NameLength );
-			p_pMenu->pMenuItems[ Index ].pName[ NameLength ] = '\0';*/
+			memcpy( p_pMenu->pMenuItems[ Index ].pName,
+				p_pMenuItems[ Index ].pName, NameLength );
+			p_pMenu->pMenuItems[ Index ].pName[ NameLength ] = '\0';
 		}
 
 		p_pMenu->pMenuItems[ p_MenuItemCount - 1 ].pNext = NULL;

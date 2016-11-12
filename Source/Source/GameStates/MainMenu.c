@@ -29,12 +29,12 @@ static Sint32 Load( void *p_pArgs )
 	MenuItems[ 1 ].pName = "Options";
 	MenuItems[ 1 ].Function = NULL;
 
-	MenuItems[ 2 ].pName = "Exit to BootROm";
+	MenuItems[ 2 ].pName = "Exit to BootROM";
 	MenuItems[ 2 ].Function = &BootROM;
 
 	SelectionHighlight.Base.Type = SELECTION_HIGHLIGHT_TYPE_STRING;
 	SelectionHighlight.Base.HighlightColour = HighlightColour;
-	SelectionHighlight.pString = "- ";
+	SelectionHighlight.pString = "";
 
 	if( MNU_Initialise( &MainMenuState.Menu, MenuItems,
 		sizeof( MenuItems ) / sizeof( MenuItems[ 0 ] ), &SelectionHighlight,
