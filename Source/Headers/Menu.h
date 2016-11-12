@@ -46,8 +46,12 @@ typedef struct _tagSELECTION_HIGHLIGHT
 	SELECTION_HIGHLIGHT_TYPE	Type;
 	Uint32						Flags;
 	KMPACKEDARGB				HighlightColour;
-	float						TextPulseRate;
-	float						TextHighlightPulseRate;
+	/* Pulse rate in microseconds */
+	Uint32						TextPulseRate;
+	Uint32						TextHighlightPulseRate;
+	Uint32						TextPulseRateElapsed;
+	Uint32						TextHighlightPulseRateElapsed;
+	Uint32						LastTime;
 }SELECTION_HIGHLIGHT, *PSELECTION_HIGHLIGHT;
 
 typedef struct _tagSELECTION_HIGHLIGHT_BOX

@@ -102,6 +102,10 @@ Sint32 MNU_Initialise( PMENU p_pMenu, PMENU_ITEM p_pMenuItems,
 	p_pMenu->TextColour = p_TextColour;
 	p_pMenu->MenuItemAlignment = p_MenuItemAlignment;
 
+	p_pMenu->pSelectionHighlight->TextPulseRateElapsed = 0UL;
+	p_pMenu->pSelectionHighlight->TextHighlightPulseRateElapsed = 0UL;
+	p_pMenu->pSelectionHighlight->LastTime = syTmrGetCount( );
+
 	return MNU_OK;
 }
 
@@ -173,7 +177,59 @@ PMENU_ITEM MNU_GetSelectedMenuItem( PMENU p_pMenu )
 
 void MNU_Render( PMENU p_pMenu, float p_Spacing, float p_X, float p_Y )
 {
+	KMBYTE TextPulseAlpha = 255;
+	KMBYTE TextHighlightAlpha = 255;
 	size_t Index;
+	Uint32 StartTime = syTmrGetCount( );
+
+	p_pMenu->pSelectionHighlight->HighlightColour.byte.bAlpha = 255;
+
+	if( p_pMenu->pSelectionHighlight->TextPulseRate > 0UL )
+	{
+	}
+
+	if( p_pMenu->pSelectionHighlight->TextHighlightPulseRate > 0UL )
+	{
+		p_pMenu->pSelectionHighlight->TextHighlightPulseRateElapsed +=
+			syTmrCountToMicro( syTmrDiffCount( p_pMenu->pSelectionHighlight->LastTime,
+				StartTime ) );
+
+		/* Map the time to a 0-1 scale for the alpha */
+		if( p_pMenu->pSelectionHighlight->TextHighlightPulseRateElapsed >
+			p_pMenu->pSelectionHighlight->TextHighlightPulseRate )
+		{
+			p_pMenu->pSelectionHighlight->TextHighlightPulseRateElapsed = 0UL;
+			p_pMenu->pSelectionHighlight->HighlightColour.byte.bAlpha = 0;
+		}
+		else
+		{
+			float Highlight;
+			KMPACKEDARGB col;
+
+			/* Scale 0 - 1 */
+			Highlight = ( float )(
+				p_pMenu->pSelectionHighlight->TextHighlightPulseRate -
+				p_pMenu->pSelectionHighlight->TextHighlightPulseRateElapsed );
+			Highlight /= ( float )(
+				p_pMenu->pSelectionHighlight->TextHighlightPulseRate );
+
+			/* 0.0f = Transparent
+			 * 0.5f = Opaque
+			 * 1.0f = Transparent
+			 */
+			if( Highlight > 0.5f )
+			{
+			Highlight = 0.5f - Highlight;
+			}
+
+			Highlight *= 2.0f;
+
+			TextHighlightAlpha = ( KMBYTE )( Highlight * 255.0f );
+
+			p_pMenu->pSelectionHighlight->HighlightColour.byte.bAlpha =
+				( KMBYTE )( Highlight * 255.0f );
+		}
+	}
 
 	for( Index = 0; Index < p_pMenu->MenuItemCount; ++Index )
 	{
@@ -338,5 +394,7 @@ void MNU_Render( PMENU p_pMenu, float p_Spacing, float p_X, float p_Y )
 			}
 		}
 	}
+
+	p_pMenu->pSelectionHighlight->LastTime = syTmrGetCount( );
 }
 

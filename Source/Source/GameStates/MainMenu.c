@@ -34,6 +34,7 @@ static Sint32 Load( void *p_pArgs )
 
 	SelectionHighlight.Base.Type = SELECTION_HIGHLIGHT_TYPE_STRING;
 	SelectionHighlight.Base.HighlightColour = HighlightColour;
+	SelectionHighlight.Base.TextHighlightPulseRate = 400000UL;
 	SelectionHighlight.pString = "";
 
 	if( MNU_Initialise( &MainMenuState.Menu, MenuItems,
